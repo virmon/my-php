@@ -3,6 +3,18 @@ require("../data/teams-model");
 const mongoose = require("mongoose");
 const Team = mongoose.model("Team");
 
+const response = { status: 404, message: {"message": "Not found"}};
+
+const _setResponse = function (status, message) {
+    response.status = status;
+    response.message = message;
+    console.log("Set response to", response);
+}
+
+const _sendResponse = function(res, response) {
+    res.status(response.status).json(response.message);
+}
+
 const getAll = function(req, res) {
     let offset = parseFloat(process.env.DEFAULT_FIND_OFFSET, process.env.DEFAULT_BASE);
     let count = parseFloat(process.env.DEFAULT_FIND_COUNT, process.env.DEFAULT_BASE);
@@ -15,36 +27,21 @@ const getAll = function(req, res) {
     }
     if (isNaN(offset) || isNaN(count)) {
         res.status(400).json({"message": "QueryString Offset and Count should be numbers"});
-        return; 
+        return;
     }
-
-    Team.find().skip(offset).limit(count).exec(function(err, teams) {
-        if (err) {
-            console.log("Error finding teams", err);
-            res.status(500).json(err.message);
-        } else {
-            console.log("No. of teams found", teams.length);
-            res.status(200).json(teams);
-        }
-    });
+    
+    Team.find().skip(offset).limit(count).exec()
+        .then((foundTeams) => _setResponse(200, foundTeams))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const getOne = function(req, res) {
     const teamId = req.params.teamId;
-    Team.findById(teamId).exec(function(err, theTeam) {
-        if (err) {
-            console.log("Error finding the team", err);
-            res.status(500).json(err.message);
-        } else {
-            if (theTeam) {
-                console.log("Found team", theTeam);
-                res.status(200).json(theTeam);
-            } else {
-                console.log("Team not found", theTeam);
-                res.status(400).json({"message": "Team not found"});
-            }
-        }
-    });
+    Team.findById(teamId).exec()
+        .then((foundTeam) => _setResponse(200, foundTeam))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const addOne = function(req, res) {
@@ -55,15 +52,10 @@ const addOne = function(req, res) {
         newTeam.teamName = req.body.teamName;
         newTeam.established = req.body.established;
 
-        Team.create(newTeam, function(err, team) {
-            const response = { status: 201, message: team };
-            if (err) {
-                console.log("Error adding the team", err);
-                response.status = 500;
-                response.message = err;
-            }
-            res.status(response.status).json(response.message);
-        });
+        Team.create(newTeam)
+            .then((newTeam) => _setResponse(201, newTeam))
+            .catch((err) => _setResponse(500, err))
+            .finally(() => _sendResponse(res, response));
     }
 }
 
@@ -84,45 +76,34 @@ const addMany = function(req, res) {
 
 const _updateOne = function(req, res, updateTeamCallback) {
     const teamId = req.params.teamId;
-    
-    Team.findById(teamId).exec(function(err, team) {
-        const response = { status: 204, message: team };
-
-        if (err) {
-            console.log("Error on update", err);
-            response.status = 500;
-            response.message = err;
-        } else if (!team) {
-            response.status = 404;
-            response.message = {"message": "Team not found"};
-        } 
-        if (response.status !== 204) {
-            res.status(response.status).json(response.message);
-        } else {
-            updateTeamCallback(req, res, team, response);
-        }
-    });
+    Team.findById(teamId).exec()
+        .then((team) => updateTeamCallback(req, team))
+        .then((updatedTeam) => _setResponse(200, updatedTeam))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const fullUpdateOne = function(req, res) {
-    const teamUpdate = function (req, res, team, response) {
+    const teamUpdate = function (req, team) {
         team.teamName = req.body.teamName;
         team.established = req.body.established;
         team.championshipsWon = req.body.championshipsWon;
         team.players = [];
-        team.save(function(err, updatedTeam) {
-            if (err) {
-                response.status = 500;
-                response.message = err;
+        team.save();
+
+        return new Promise((resolve, reject) => {
+            if (team) {
+                resolve(team);
+            } else {
+                reject();
             }
-            res.status(response.status).json(response.message);
         });
     }
     _updateOne(req, res, teamUpdate);
 }
 
 const partialUpdateOne = function(req, res) {
-    const teamUpdate = function (req, res, team, response) {
+    const teamUpdate = function (req, team) {
         if (req.body.teamName) {
             team.teamName = req.body.teamName;
         }
@@ -135,12 +116,14 @@ const partialUpdateOne = function(req, res) {
         if (req.body.players) {
             team.players = [];
         }
-        team.save(function(err, updatedTeam) {
-            if (err) {
-                response.status = 500;
-                response.message = err;
+        team.save();
+
+        return new Promise((resolve, reject) => {
+            if (team) {
+                resolve(team);
+            } else {
+                reject();
             }
-            res.status(response.status).json(response.message);
         });
     }
     _updateOne(req, res, teamUpdate);
@@ -148,23 +131,17 @@ const partialUpdateOne = function(req, res) {
 
 const deleteOne = function(req, res) {
     const teamId = req.params.teamId;
-    Team.findByIdAndDelete(teamId, function(err, deletedTeam) {
-        if (err) {
-            console.log("Error on deleting", err);
-            res.status(500).json(err.message);
-        } else {
-            console.log("Successfully deleted", deletedTeam);
-            res.status(200).json(deletedTeam);
-        }
-        
-    });
+    Team.findById(teamId).remove()
+        .then((deletedTeam) => _setResponse(200, deletedTeam))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 module.exports = {
-    getAll,
-    getOne,
-    addOne,
+    getAll: getAll,
+    getOne: getOne,
+    addOne: addOne,
     fullUpdateOne: fullUpdateOne,
     partialUpdateOne: partialUpdateOne,
-    deleteOne
+    deleteOne: deleteOne
 }
