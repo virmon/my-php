@@ -54,16 +54,15 @@ const addOne = function(req, res) {
         const newTeam = {};
         newTeam.teamName = req.body.teamName;
         newTeam.established = req.body.established;
-        
-        const newTeamInstance = new Team(newTeam);
-        newTeamInstance.save(function(err, team) {
+
+        Team.create(newTeam, function(err, team) {
+            const response = { status: 201, message: team };
             if (err) {
                 console.log("Error adding the team", err);
-                res.status(500).json(err.message);
-            } else {
-                console.log("Added new team", team.teamName);
-                res.status(200).json(team);
+                response.status = 500;
+                response.message = err;
             }
+            res.status(response.status).json(response.message);
         });
     }
 }
@@ -83,22 +82,68 @@ const addMany = function(req, res) {
     }
 }
 
-const updateOne = function(req, res) {
+const _updateOne = function(req, res, updateTeamCallback) {
     const teamId = req.params.teamId;
-    const updatedTeam = {};
-    updatedTeam.teamName = req.body.teamName;
-    updatedTeam.established = req.body.established;
+    
+    Team.findById(teamId).exec(function(err, team) {
+        const response = { status: 204, message: team };
 
-    Team.findById(teamId)
-        .updateOne({$set: updatedTeam}, function(err, updatedStatus) {
+        if (err) {
+            console.log("Error on update", err);
+            response.status = 500;
+            response.message = err;
+        } else if (!team) {
+            response.status = 404;
+            response.message = {"message": "Team not found"};
+        } 
+        if (response.status !== 204) {
+            res.status(response.status).json(response.message);
+        } else {
+            updateTeamCallback(req, res, team, response);
+        }
+    });
+}
+
+const fullUpdateOne = function(req, res) {
+    const teamUpdate = function (req, res, team, response) {
+        team.teamName = req.body.teamName;
+        team.established = req.body.established;
+        team.championshipsWon = req.body.championshipsWon;
+        team.players = [];
+        team.save(function(err, updatedTeam) {
             if (err) {
-                console.log("Error on update", err);
-                res.status(500).json(err.message);
-            } else {
-                console.log("Successfully updated", updatedStatus);
-                res.status(200).json(updatedStatus);
+                response.status = 500;
+                response.message = err;
             }
+            res.status(response.status).json(response.message);
         });
+    }
+    _updateOne(req, res, teamUpdate);
+}
+
+const partialUpdateOne = function(req, res) {
+    const teamUpdate = function (req, res, team, response) {
+        if (req.body.teamName) {
+            team.teamName = req.body.teamName;
+        }
+        if (req.body.established) {
+            team.established = req.body.established;
+        }
+        if (req.body.championshipsWon) {
+            team.championshipsWon = req.body.championshipsWon;
+        }
+        if (req.body.players) {
+            team.players = [];
+        }
+        team.save(function(err, updatedTeam) {
+            if (err) {
+                response.status = 500;
+                response.message = err;
+            }
+            res.status(response.status).json(response.message);
+        });
+    }
+    _updateOne(req, res, teamUpdate);
 }
 
 const deleteOne = function(req, res) {
@@ -119,6 +164,7 @@ module.exports = {
     getAll,
     getOne,
     addOne,
-    updateOne,
+    fullUpdateOne: fullUpdateOne,
+    partialUpdateOne: partialUpdateOne,
     deleteOne
 }

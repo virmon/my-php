@@ -30,4 +30,3 @@ const teamSchema = mongoose.Schema({
 });
 
 mongoose.model("Team", teamSchema, "teams");
-mongoose.model("Player", playerSchema, "players");
