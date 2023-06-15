@@ -1,7 +1,31 @@
 const mongoose = require("mongoose");
 const Team = mongoose.model(process.env.TEAM_MODEL);
 
-const getAll = function(req, res) {
+const response = { status: 404, message: "Not found" };
+
+const _setResponse = function (status, message) {
+    response.status = status;
+    response.message = message;
+}
+
+const _sendResponse = function (res, response) {
+    res.status(response.status).json(response.message);
+}
+
+const _checkTeamExists = function (team) {
+    return new Promise((resolve, reject) => {
+        if (!team) {
+            _setResponse(404, { "message": process.env.TEAM_NOT_FOUND });
+        } else {
+            _setResponse(200, team.players);
+        }
+        resolve(team);
+    });
+}
+
+const _findTeam = function (req) {
+    const teamId = req.params.teamId;
+
     let offset = parseFloat(process.env.DEFAULT_FIND_OFFSET, process.env.DEFAULT_BASE);
     let count = parseFloat(process.env.DEFAULT_FIND_COUNT, process.env.DEFAULT_BASE);
 
@@ -12,102 +36,60 @@ const getAll = function(req, res) {
         count = parseInt(req.query.count);
     }
     if (isNaN(offset) || isNaN(count)) {
-        res.status(400).json({"message": "QueryString Offset and Count should be numbers"});
-        return; 
+        _setResponse(400, process.env.LIMITER_ERROR_MESSAGE);
+        return;
     }
 
-    const teamId = req.params.teamId;
-    Team.findById(teamId).select("players").exec(function(err, team) {
-        if (err) {
-            console.log("Error in finding players");
-            res.status(500).json(err);
-        } else if (!team) {
-            console.log("Team not found");
-            res.status(404).json({"message" : "Team not found"});
+    return Team.findById(teamId)
+        .select("players")
+        .exec();
+}
+
+const _findPlayer = function (team, playerId) {
+    const thePlayer = team.players.id(playerId);
+
+    return new Promise((resolve, reject) => {
+        if (thePlayer) {
+            console.log("Found player", thePlayer, "for Team", team.teamName);
+            _setResponse(200, thePlayer);
         } else {
-            console.log("Found players", team.players, "for Team", team);
-            res.status(200).json(team.players);
+            console.log("Player not found", thePlayer);
+            _setResponse(400, { "message": "Player not found" });
         }
+        resolve();
+    })
+}
+
+const _fillPlayerData = function (req) {
+    return new Promise((resolve, reject) => {
+        const newPlayer = {};
+        newPlayer.playerName = req.body.playerName;
+        newPlayer.joinedTeam = req.body.joinedTeam;
+        newPlayer.joinedNBA = req.body.joinedNBA;
+        resolve(newPlayer);
     });
 }
 
-const getOne = function(req, res) {
-    const teamId = req.params.teamId;
-    const playerId = req.params.playerId;
-
-    Team.findById(teamId).exec(function(err, team) {
-        if (err) {
-            console.log("error finding the player", err);
-            res.status(500).json(err);
-        } else {
-            const thePlayer = team.players.id(playerId);
-            if (thePlayer) {
-                console.log("Found player", thePlayer, "for Team", team.teamName);
-                res.status(200).json(thePlayer);
-            } else {
-                console.log("Player not found", thePlayer);
-                res.status(400).json({"message": "Player not found"});
-            }
-        }  
-    });
-}
-
-const addOne = function(req, res) {
-    const teamId = req.params.teamId;
-    
-    Team.findById(teamId).select("players").exec(function(err, theTeam) {
-        const response = { status: 201, message: theTeam };
-        if(err) {
-            console.log("Error saving new player", err);
-            response.status = 500;
-            response.message = err;
-        } else if (!theTeam) {
-            response.status = 404;
-            response.message = {"message": "TeamId not Found"};    
-        }
-        if (theTeam) {
-            _addPlayer(req, res, theTeam);
-        } else {
-            res.status(response.status).json(response.message);
-        }
-    });
-}
-
-const _addPlayer = function(req, res, team) {
-    const newPlayer = {};
-    newPlayer.playerName = req.body.playerName;
-    newPlayer.joinedTeam = req.body.joinedTeam;
-    newPlayer.joinedNBA = req.body.joinedNBA;
-    
+const _saveNewPlayer = function (team, newPlayer) {
     team.players.push(newPlayer);
-    team.save(function(err, updatedTeam){ 
-        const response = { status: 201, message: updatedTeam };
-        if (err) {
-            response.status = 500;
-            response.message = err;
-        }
-        console.log("Saved new player successfully");
-        res.status(response.status).json(response.message);
-    });
+    return team.save();
 }
 
-const _updateOne = function(req, res, playerUpdateCallback) {
+const _addPlayer = function (req, res, team) {
+    _fillPlayerData(req)
+        .then((filledNewPlayer) => _saveNewPlayer(team, filledNewPlayer))
+        .then((updatedTeam) => _setResponse(201, updatedTeam));
+}
+
+const _updateOne = function (req, res, playerUpdateCallback) {
     const teamId = req.params.teamId;
 
-    Team.findById(teamId).select("players").exec(function (err, team) {
-        const response = { status: 204, message: team };
-        if (err) {
-            response.status = 500;
-            response.status = err;
-        } else if (!team) {
-            response.status = 404;
-            response.message = {"message": "Team Id not found"};
-        } 
-        if (response.status !== 204) {
-            res.status(response.status).json(response.message);
-        }
-        playerUpdateCallback(req, res, team);
-    });
+    _findTeam(req)
+        .then((team) => _checkTeamExists(team))
+        .then((team) => playerUpdateCallback(req, res, team))
+        .then((team) => _setResponse(204, team))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const _fullPlayerUpdate = function (req, res, team) {
@@ -117,16 +99,8 @@ const _fullPlayerUpdate = function (req, res, team) {
     thePlayer.playerName = req.body.playerName;
     thePlayer.joinedTeam = req.body.joinedTeam;
     thePlayer.joinedNBA = req.body.joinedNBA;
-    
-    team.save(function(err, updatedTeam) {
-        const response = { status: 204, message: updatedTeam };
-        if (err) {
-            response.status = 500;
-            response.message = err;
-        }
-        console.log("_fullPlayerUpdate success", updatedTeam.players);
-        res.status(response.status).json(response.message);
-    });
+
+    return team.save();
 }
 
 const _partialPlayerUpdate = function (req, res, team) {
@@ -142,15 +116,38 @@ const _partialPlayerUpdate = function (req, res, team) {
     if (req.body.joinedNBA) {
         thePlayer.joinedNBA = req.body.joinedNBA;
     }
-    team.save(function(err, updatedTeam) {
-        const response = { status: 204, message: updatedTeam };
-        if (err) {
-            response.status = 500;
-            response.message = err;
-        }
-        console.log("_partialPlayerUpdate success", updatedTeam.players);
-        res.status(response.status).json(response.message);
-    });
+    return team.save();
+}
+
+const _deletePlayer = function (theTeam, playerId) {
+    const thePlayer = theTeam.players.id(playerId);
+    thePlayer.remove();
+    return theTeam.save();
+}
+
+const getAll = function (req, res) {
+    _findTeam(req)
+        .then((team) => _checkTeamExists(team))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
+}
+
+const getOne = function (req, res) {
+    const playerId = req.params.playerId;
+
+    _findTeam(req)
+        .then((team) => _checkTeamExists(team))
+        .then((team) => _findPlayer(team, playerId))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
+}
+
+const addOne = function (req, res) {
+    _findTeam(req)
+        .then((theTeam) => _checkTeamExists(theTeam))
+        .then((theTeam) => _addPlayer(req, res, theTeam))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const fullUpdateOne = function (req, res) {
@@ -163,22 +160,14 @@ const partialUpdateOne = function (req, res) {
     _updateOne(req, res, _partialPlayerUpdate);
 }
 
-const deleteOne = function(req, res) {
-    const teamId = req.params.teamId;
+const deleteOne = function (req, res) {
     const playerId = req.params.playerId;
 
-    Team.findById(teamId).select("players").exec(function(err, theTeam) {
-        if (err) {
-            console.log("Error deleting player", err);
-            res.status(500).json(err.message);
-        } else {
-            const thePlayer = theTeam.players.id(playerId);
-            thePlayer.remove();
-            theTeam.save();
-            console.log("Deleted the player successfully", thePlayer);
-            res.status(200).json(thePlayer);
-        }
-    });
+    _findTeam(req)
+        .then((team) => _deletePlayer(team, playerId))
+        .then((deletedPlayer) => _setResponse(202, deletedPlayer))
+        .catch((err) => _setResponse(500, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 module.exports = {
