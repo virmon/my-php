@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Team = mongoose.model(process.env.TEAM_MODEL);
 
-const response = { status: 404, message: "Not found" };
+const response = { status: 404, message: "" };
 
 const _setResponse = function (status, message) {
     response.status = status;
@@ -36,13 +36,17 @@ const _findTeam = function (req) {
         count = parseInt(req.query.count);
     }
     if (isNaN(offset) || isNaN(count)) {
-        _setResponse(400, process.env.LIMITER_ERROR_MESSAGE);
+        _setResponse(400, { "message": process.env.LIMITER_ERROR_MESSAGE });
         return;
     }
 
-    return Team.findById(teamId)
-        .select("players")
-        .exec();
+    const query = {
+        "players": {
+            $slice: [offset, count]
+        }
+    };
+
+    return Team.findById(teamId).select(query).exec();
 }
 
 const _findPlayer = function (team, playerId) {
@@ -50,11 +54,9 @@ const _findPlayer = function (team, playerId) {
 
     return new Promise((resolve, reject) => {
         if (thePlayer) {
-            console.log("Found player", thePlayer, "for Team", team.teamName);
             _setResponse(200, thePlayer);
         } else {
-            console.log("Player not found", thePlayer);
-            _setResponse(400, { "message": "Player not found" });
+            _setResponse(400, { "message": process.env.PLAYER_NOT_FOUND });
         }
         resolve();
     })
