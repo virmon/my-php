@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+require("../data/teams-model");
+require("../data/users-model");
+
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const _logMongooseConnected = function () { console.log(process.env.MONGOOSE_CONNECTED + process.env.DB_NAME); }
