@@ -1,0 +1,15 @@
+div > ul {
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    border: 1px solid black;
+    width: 15%;
+    height: 70px;
+    text-align: center;
+    padding: 30px;
+    margin: 20px auto;
+}

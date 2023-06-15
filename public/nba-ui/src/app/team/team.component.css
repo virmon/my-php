@@ -1,0 +1,26 @@
+table {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 0;
+    width: 100%;
+}
+
+.title, .subtitle { 
+    display: flex;
+    justify-content: center;
+}
+
+div.players-header, div.players {
+    display: flex;
+    flex-flow: row nowrap;
+    border-bottom: 1px solid black;
+    margin: 0 20px 0 0;
+}
+
+div.players-header {
+    font-weight: 600;
+}
+
+div.players > span, div.players-header > span {
+    margin: 20px auto;
+}
