@@ -10,6 +10,8 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { TeamComponent } from './team/team.component';
 import { TeamFormComponent } from './team-form/team-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PlayerFormComponent } from './player-form/player-form.component';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     TeamsComponent,
     TeamComponent,
     NotFoundComponent,
-    TeamFormComponent
+    TeamFormComponent,
+    PlayerFormComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -44,6 +48,14 @@ import { ReactiveFormsModule } from '@angular/forms';
       {
         path: "teamForm/:teamId",
         component: TeamFormComponent
+      },
+      {
+        path: "playerForm/:teamId",
+        component: PlayerFormComponent
+      },
+      {
+        path: "playerForm/:teamId/:playerId",
+        component: PlayerFormComponent
       },
       {
         path: "**",

@@ -2,21 +2,24 @@
     <h1 class="title">{{team.teamName}}</h1>
     <h3 class="subtitle">Established: {{team.established}}</h3>
     <h4>Championships Won: <span *ngFor="let trophy of trophies"> 🏆 </span></h4>
-    <!-- <table>
+    <table class="players">
         <tr>
             <th>Player</th>
             <th>Joined Team</th>
             <th>Joined NBA</th>
+            <th>Actions</th>
         </tr>
         <tr *ngFor="let player of players">
-            <td >{{player.playerName}}</td>
-            <td >{{player.joinedTeam}}</td>
-            <td >{{player.joinedNBA}}</td>
-            <td><button>Edit</button></td>
-            <td><button>Delete team</button></td>
+            <td>{{player.playerName}}</td>
+            <td>{{player.joinedTeam}}</td>
+            <td>{{player.joinedNBA}}</td>
+            <td>
+                <button routerLink="/playerForm/{{team._id}}/{{player._id}}">Edit</button>
+                <button (click)="onDelete(player._id)">Delete</button>
+            </td>
         </tr>
-    </table> -->
-    <div class="players-header">
+    </table>
+    <!-- <div class="players-header">
         <span>Players</span>
         <span>Joined Team</span>
         <span>Joined NBA</span>
@@ -25,9 +28,10 @@
         <span>{{player.playerName}}</span>
         <span>{{player.joinedTeam}}</span>
         <span>{{player.joinedNBA}}</span>
-        <td><button>Edit</button></td>
-        <td><button>Delete team</button></td>
-    </div>
+        <td><button routerLink="/playerForm/{{team._id}}/{{player._id}}">Edit</button></td>
+        <td><button (click)="onDelete(player._id)">Delete</button></td>
+    </div> -->
 </div>
 
 <button routerLink="/teamForm/{{team._id}}">Edit</button>
+<button routerLink="/playerForm/{{team._id}}">Add Player</button>

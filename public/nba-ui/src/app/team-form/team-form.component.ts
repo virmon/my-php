@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { TeamDataService } from '../team-data.service';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
+import { TeamDataService } from '../team-data.service';
 import { Team } from '../teams/teams.component';
 
 @Component({
@@ -15,7 +16,7 @@ export class TeamFormComponent implements OnInit {
   #teamForm!: FormGroup;
   get teamForm(): FormGroup { return this.#teamForm; }
 
-  constructor(private _formBuilder: FormBuilder, private teamService: TeamDataService, private route: ActivatedRoute) {
+  constructor(private _formBuilder: FormBuilder, private teamService: TeamDataService, private route: ActivatedRoute, private location: Location) {
     this.#teamForm = this._formBuilder.group({
       teamName: "",
       established: "",
@@ -51,5 +52,10 @@ export class TeamFormComponent implements OnInit {
         console.log("New team added", team);
       });
     }
+    this.goBack();
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

@@ -1,0 +1,28 @@
+form {
+    margin: 10px;
+}
+
+form > div {
+    padding: 6px;
+}
+
+label {
+    display: block;
+    width: 80%;
+    margin: auto;
+    justify-content: center;
+}
+
+input {
+    display: block;
+    width: 80%;
+    margin: auto;
+    justify-content: center;
+    height: 30px;
+}
+
+div > button {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: auto;
+}

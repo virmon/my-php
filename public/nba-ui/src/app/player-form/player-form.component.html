@@ -1,0 +1,39 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="playerForm">
+    <div>
+        <label for="playerName">Player</label>
+        <input 
+            placeholder="the player name" 
+            id="playerName"
+            name="playerName"
+            formControlName="playerName"
+        />
+    </div>
+
+    <div>
+        <label for="established">Joined Team</label>
+        <input 
+            placeholder="year the player joined this team" 
+            id="established" 
+            name="established"
+            formControlName="joinedTeam"
+        />
+    </div>
+
+    <div>
+        <label for="joinedNBA">Joined NBA</label>
+        <input 
+            placeholder="year the player joined NBA" 
+            id="joinedNBA" 
+            name="joinedNBA"
+            formControlName="joinedNBA"
+        />
+    </div>
+    
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</form>
+
+<div>
+    <button (click)="goBack()">Go back</button>
+</div>

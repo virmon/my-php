@@ -25,7 +25,7 @@ export class TeamDataService {
   }
   
   public updateOne(teamId: String, updatedTeam: Team): Observable<Team> {
-    return this.http.put<Team>(this.baseUrl + `/${teamId}`, updatedTeam);
+    return this.http.patch<Team>(this.baseUrl + `/${teamId}`, updatedTeam);
   }
   
   public deleteOne(teamId: String): Observable<Team> {

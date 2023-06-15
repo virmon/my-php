@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TeamDataService } from '../team-data.service';
 import { Player, Team } from '../teams/teams.component';
 import { ActivatedRoute } from '@angular/router';
+import { PlayerDataService } from '../player-data.service';
 
 @Component({
   selector: 'app-team',
@@ -23,7 +24,7 @@ export class TeamComponent implements OnInit {
   get players(): Player[] { return this.#players; }
   set players(players: Player[]) { this.#players = players; }
 
-  constructor(private _teamsService: TeamDataService, private _route: ActivatedRoute) {
+  constructor(private _teamsService: TeamDataService, private _playerService: PlayerDataService, private _route: ActivatedRoute) {
     this.team = new Team();
     this.players = [];
   }
@@ -46,4 +47,18 @@ export class TeamComponent implements OnInit {
     })
   }
 
+  onDelete(playerId: String): void {
+    this._playerService.deleteOne(this.team._id, playerId).subscribe({
+      next: (team) => {
+        console.log("Deleted player", team.players);
+        this.players = team.players;
+      },
+      error: (err) => {
+        console.log("Error deleting player", err);
+      },
+      complete: () => {
+        
+      }
+    });
+  }
 }
