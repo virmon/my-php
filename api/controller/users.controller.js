@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const util = require("util");
 
 const User = mongoose.model("User");
 
@@ -54,7 +56,7 @@ const _validateUsername = function (filledUser) {
 
 const _createNewUser = function (validatedUser) {
     console.log("create user called");
-    User.create(validatedUser);
+    return User.create(validatedUser);
 }
 
 const register = function (req, res) {
@@ -70,29 +72,45 @@ const register = function (req, res) {
         .finally(() => _sendResponse(res, response));
 }
 
-const _checkPassword = function (requestedPassword, savedPassword) {
+const _checkPassword = function (databasePassword, user) {
     console.log("Check password called");
-    return bcrypt.compare(requestedPassword, savedPassword);
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(databasePassword, user.password)
+            .then((isUserAuthenticated) => {
+                if (isUserAuthenticated) {
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            });
+    });
 }
 
-const _checkUserVerified = function (isUserVerified) {
-    console.log("isUserVerified", isUserVerified);
+const _checkExists = function (foundUser) {
+    console.log("checkExists called", foundUser);
     return new Promise((resolve, reject) => {
-        if (isUserVerified) {
-            resolve();
-        } else {
+        if (!foundUser) {
             reject();
+        } else {
+            resolve(foundUser);
         }
     });
 }
 
+const _generateToken = function (name) {
+    const sign = util.promisify(jwt.sign);
+    return sign({"name": name}, "secretKey", {expiresIn: 3600});
+}
+
 const login = function (req, res) {
     console.log("Login called");
+
     User.findOne({"username": req.body.username})
-        .then((foundUser) => _checkPassword(req.body.password, foundUser.password))
-        .then((isUserVerified) => _checkUserVerified(isUserVerified))
-        .then(() => _setResponse(200, {"message": "Login success"}))
-        .catch(() => _setResponse(500, {"message": "Login failed"}))
+        .then((foundUser) => _checkExists(foundUser))
+        .then((user) => _checkPassword(req.body.password, user))
+        .then((user) => _generateToken(user.name))
+        .then((token) => _setResponse(200, {token}))
+        .catch(() => _setResponse(500, {"message": process.env.LOGIN_FAILED}))
         .finally(() => _sendResponse(res, response));
 }
 

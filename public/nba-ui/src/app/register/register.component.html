@@ -1,1 +1,47 @@
-<p>register works!</p>
+<div class="registration">
+    <form (ngSubmit)="register(registerForm)" [formGroup]="registerForm">
+        <div>
+            <label for="name">Name</label>
+            <input 
+                placeholder="Name" 
+                id="name"
+                name="name"
+                formControlName="name"
+            />
+        </div>
+    
+        <div>
+            <label for="username">Username</label>
+            <input 
+                placeholder="Username" 
+                id="username" 
+                name="username"
+                formControlName="username"
+            />
+        </div>
+    
+        <div>
+            <label for="password">Password</label>
+            <input 
+                placeholder="Password" 
+                id="password" 
+                name="password"
+                formControlName="password"
+            />
+        </div>
+    
+        <div>
+            <label for="repeatPassword">Repeat Password</label>
+            <input 
+                placeholder="Repeat Password" 
+                id="repeatPassword" 
+                name="repeatPassword"
+                formControlName="repeatPassword"
+            />
+        </div>
+        
+        <div>
+            <button type="submit">Register Account</button>
+        </div>
+    </form>
+</div>

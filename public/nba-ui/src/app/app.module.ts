@@ -9,9 +9,10 @@ import { TeamsComponent } from './teams/teams.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { TeamComponent } from './team/team.component';
 import { TeamFormComponent } from './team-form/team-form.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PlayerFormComponent } from './player-form/player-form.component';
 import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -22,12 +23,14 @@ import { RegisterComponent } from './register/register.component';
     NotFoundComponent,
     TeamFormComponent,
     PlayerFormComponent,
-    RegisterComponent
+    RegisterComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterModule.forRoot([
       {
         path: "",
@@ -56,6 +59,14 @@ import { RegisterComponent } from './register/register.component';
       {
         path: "playerForm/:teamId/:playerId",
         component: PlayerFormComponent
+      },
+      {
+        path: "register",
+        component: RegisterComponent
+      },
+      {
+        path: "login",
+        component: LoginComponent
       },
       {
         path: "**",
