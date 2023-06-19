@@ -1,0 +1,35 @@
+ul {
+    display: flex;
+    flex-flow: row nowrap;
+    background-color: #000;
+    list-style-type: none;
+    margin: 0;
+}
+
+ul li {
+    color: white;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.authentication {
+    position: absolute;
+    right: 0;
+}
+
+@media screen and (max-width: 600px) {
+    ul {
+        flex-flow: column wrap;
+        margin: auto;
+        padding: 0;
+    }
+
+    li {
+        margin: auto;
+
+    }
+
+    .authentication {
+       position: relative;
+    }
+}

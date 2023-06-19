@@ -20,7 +20,7 @@ router.route("/:teamId/players")
     .get(playersController.getAll)
     .post(playersController.addOne);
 
-router.route("/:playerId")
+router.route("/:teamId/players/:playerId")
     .get(playersController.getOne)
     .put(playersController.fullUpdateOne)
     .patch(playersController.partialUpdateOne)

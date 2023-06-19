@@ -19,19 +19,6 @@
             </td>
         </tr>
     </table>
-    <!-- <div class="players-header">
-        <span>Players</span>
-        <span>Joined Team</span>
-        <span>Joined NBA</span>
-    </div>
-    <div class="players" *ngFor="let player of players">
-        <span>{{player.playerName}}</span>
-        <span>{{player.joinedTeam}}</span>
-        <span>{{player.joinedNBA}}</span>
-        <td><button routerLink="/playerForm/{{team._id}}/{{player._id}}">Edit</button></td>
-        <td><button (click)="onDelete(player._id)">Delete</button></td>
-    </div> -->
+    <button routerLink="/teamForm/{{team._id}}">Edit</button>
+    <button routerLink="/playerForm/{{team._id}}">Add Player</button>
 </div>
-
-<button routerLink="/teamForm/{{team._id}}">Edit</button>
-<button routerLink="/playerForm/{{team._id}}">Add Player</button>
