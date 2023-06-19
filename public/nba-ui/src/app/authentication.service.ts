@@ -1,5 +1,6 @@
-import { EventEmitter, Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+
 import { LoginToken } from './login/login.component';
 
 @Injectable({
@@ -9,13 +10,21 @@ export class AuthenticationService {
   #isLoggedIn!: boolean;
   #name!: string;
 
-  get name() { return this.#name; }
+  get name() {
+    const token = localStorage.getItem("token") as string;
+    return this._jwt.decodeToken(token).name as string;
+    // return this.#name;
+  }
   set name(name: string) { this.#name = name; }
 
   get isLoggedIn() { return this.#isLoggedIn; }
   set isLoggedIn(isLoggedIn: boolean) { this.#isLoggedIn = isLoggedIn; }
 
-  constructor() { }
+  constructor(private _jwt: JwtHelperService) { }
+
+  getToken() {
+    return localStorage.getItem("token");
+  }
 
   login(token: LoginToken) {
     this.isLoggedIn = true;
