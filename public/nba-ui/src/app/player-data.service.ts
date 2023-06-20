@@ -2,38 +2,39 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Player, Team } from './teams/teams.component';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerDataService {
 
-  private baseUrl = "http://localhost:3001/api/teams";
+  private baseUrl = environment.TEAMS_BASE_URL;
 
-  constructor(private http: HttpClient) { }
+  constructor(private _http: HttpClient) { }
 
   public getAll(teamId: String): Observable<Player[]> {
-    const url = this.baseUrl + `/${teamId}/players`;
-    return this.http.get<Player[]>(url);
+    const url = `${this.baseUrl}/${teamId}/players`;
+    return this._http.get<Player[]>(url);
   }
   
   public getOne(teamId: String, playerId: String): Observable<Player> {
-    return this.http.get<Player>(this.baseUrl + `/${teamId}/players/${playerId}`);
+    const url = `${this.baseUrl}/${teamId}/players/${playerId}`;
+    return this._http.get<Player>(url);
   }
   
   public addOne(teamId: String, newPlayer: Player): Observable<Player> {
-    const url = this.baseUrl + `/${teamId}/players`;
-
-    return this.http.post<Player>(url, newPlayer);
+    const url = `${this.baseUrl }/${teamId}/players`;
+    return this._http.post<Player>(url, newPlayer);
   }
   
   public updateOne(teamId: String, playerId: String, updatedTeam: Player): Observable<Player> {
-    return this.http.put<Player>(this.baseUrl + `/${teamId}/players/${playerId}`, updatedTeam);
+    const url = `${this.baseUrl}/${teamId}/players/${playerId}`;
+    return this._http.put<Player>(url, updatedTeam);
   }
   
   public deleteOne(teamId: String, playerId: String): Observable<Team> {
     const url = this.baseUrl + `/${teamId}/players/${playerId}`;
-
-    return this.http.delete<Team>(url);
+    return this._http.delete<Team>(url);
   }
 }

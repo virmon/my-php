@@ -4,7 +4,9 @@
   "description": "This app is my personal hobby project about NBA basketball",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "startBackend": "node app.js",
+    "startFrontend": "cd public/nba-ui && npm start",
+    "start": "npm run startFrontend | npm run startBackend",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
