@@ -58,3 +58,24 @@ div.players>span,
 div.players-header>span {
     margin: 20px auto;
 }
+
+.edit-team {
+    position: absolute;
+    right: 20px;
+}
+
+.actions-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+}
+
+.edit-action {
+    cursor: pointer;
+    color: #5a5a5a;
+}
+
+.delete-action {
+    cursor: pointer;
+    color: #c60909;
+}

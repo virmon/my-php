@@ -3,6 +3,7 @@ import { TeamDataService } from '../team-data.service';
 import { Player, Team } from '../teams/teams.component';
 import { ActivatedRoute } from '@angular/router';
 import { PlayerDataService } from '../player-data.service';
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'app-team',
@@ -24,7 +25,10 @@ export class TeamComponent implements OnInit {
   get players(): Player[] { return this.#players; }
   set players(players: Player[]) { this.#players = players; }
 
-  constructor(private _teamsService: TeamDataService, private _playerService: PlayerDataService, private _route: ActivatedRoute) {
+  get isLoggedIn(): boolean { return this._authentication.isLoggedIn; }
+  set isLoggedIn(isLoggedIn: boolean) { this._authentication.isLoggedIn = isLoggedIn; }
+
+  constructor(private _teamsService: TeamDataService, private _playerService: PlayerDataService, private _route: ActivatedRoute, private _authentication: AuthenticationService) {
     this.team = new Team();
     this.players = [];
   }

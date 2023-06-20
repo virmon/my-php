@@ -8,14 +8,11 @@ import { LoginToken } from './login/login.component';
 })
 export class AuthenticationService {
   #isLoggedIn!: boolean;
-  #name!: string;
-
+  
   get name() {
     const token = localStorage.getItem("token") as string;
     return this._jwt.decodeToken(token).name as string;
-    // return this.#name;
   }
-  set name(name: string) { this.#name = name; }
 
   get isLoggedIn() { return this.#isLoggedIn; }
   set isLoggedIn(isLoggedIn: boolean) { this.#isLoggedIn = isLoggedIn; }

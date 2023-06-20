@@ -12,6 +12,10 @@ ul li {
     cursor: pointer;
 }
 
+ul li:hover {
+    background-color: #272525;
+}
+
 .authentication {
     position: absolute;
     right: 0;

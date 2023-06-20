@@ -15,6 +15,7 @@ import { PlayerFormComponent } from './player-form/player-form.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationInterceptor } from './authentication.interceptor';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { AuthenticationInterceptor } from './authentication.interceptor';
     TeamFormComponent,
     PlayerFormComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +71,10 @@ import { AuthenticationInterceptor } from './authentication.interceptor';
       {
         path: "login",
         component: LoginComponent
+      },
+      {
+        path: "profile",
+        component: ProfileComponent
       },
       {
         path: "**",

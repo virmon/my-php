@@ -1,8 +1,7 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="playerForm">
     <div>
-        <label for="playerName">Player</label>
         <input 
-            placeholder="the player name" 
+            placeholder="Player name" 
             id="playerName"
             name="playerName"
             formControlName="playerName"
@@ -10,19 +9,17 @@
     </div>
 
     <div>
-        <label for="established">Joined Team</label>
         <input 
-            placeholder="year the player joined this team" 
-            id="established" 
-            name="established"
+            placeholder="the year joined the team" 
+            id="joinedTeam" 
+            name="joinedTeam"
             formControlName="joinedTeam"
         />
     </div>
 
     <div>
-        <label for="joinedNBA">Joined NBA</label>
         <input 
-            placeholder="year the player joined NBA" 
+            placeholder="the year joined NBA" 
             id="joinedNBA" 
             name="joinedNBA"
             formControlName="joinedNBA"

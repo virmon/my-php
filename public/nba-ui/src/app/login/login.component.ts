@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
         console.log("Error logging in", err.message);
       },
       complete: () => {
-        this._router.navigate(['teams']);
+        this._router.navigate(['profile']);
       }
     });
   }

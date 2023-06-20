@@ -2,7 +2,7 @@
     <ul>
         <li routerLink="/">Teams</li>
         <li *ngIf="isLoggedIn" routerLink="/teamForm">Add Teams</li>
-        <li *ngIf="isLoggedIn">Profile</li>
+        <li *ngIf="isLoggedIn" routerLink="/profile">Profile</li>
         <ul class="authentication">
             <li *ngIf="!isLoggedIn" routerLink="/login">Login</li>
             <li *ngIf="!isLoggedIn" routerLink="/register">Register</li>

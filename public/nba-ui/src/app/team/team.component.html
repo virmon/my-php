@@ -1,24 +1,41 @@
 <div>
+    <div *ngIf="isLoggedIn">
+        <span class="edit-team"><button routerLink="/teamForm/{{team._id}}">Edit Team</button></span>
+    </div>
+
     <h1 class="title">{{team.teamName}}</h1>
     <h3 class="subtitle">Established: {{team.established}}</h3>
-    <h4>Championships Won: <span *ngFor="let trophy of trophies"> 🏆 </span></h4>
-    <table class="players">
-        <tr>
-            <th>Player</th>
-            <th>Joined Team</th>
-            <th>Joined NBA</th>
-            <th>Actions</th>
-        </tr>
-        <tr *ngFor="let player of players">
-            <td>{{player.playerName}}</td>
-            <td>{{player.joinedTeam}}</td>
-            <td>{{player.joinedNBA}}</td>
-            <td>
-                <button routerLink="/playerForm/{{team._id}}/{{player._id}}">Edit</button>
-                <button (click)="onDelete(player._id)">Delete</button>
-            </td>
-        </tr>
-    </table>
-    <button routerLink="/teamForm/{{team._id}}">Edit</button>
-    <button routerLink="/playerForm/{{team._id}}">Add Player</button>
+    <h4>Championships Won:
+        <span *ngFor="let trophy of trophies"> 🏆 </span>
+        <span *ngIf="!trophies.length">0</span>
+    </h4>
+
+    <div *ngIf="isLoggedIn">
+        <button routerLink="/playerForm/{{team._id}}">
+            <span>Add Player</span>
+        </button>
+    </div>
+
+    <div *ngIf="!players.length">No players found</div>
+    <div *ngIf="players.length">
+        <table class="players">
+            <tr>
+                <th>Players</th>
+                <th>Joined Team</th>
+                <th>Joined NBA</th>
+                <th *ngIf="isLoggedIn">Actions</th>
+            </tr>
+            <tr *ngFor="let player of players">
+                <td>{{player.playerName}}</td>
+                <td>{{player.joinedTeam}}</td>
+                <td>{{player.joinedNBA}}</td>
+                <td *ngIf="isLoggedIn">
+                    <span class="actions-container">
+                        <span class="material-icons edit-action" routerLink="/playerForm/{{team._id}}/{{player._id}}">edit</span>
+                        <span class="material-icons delete-action" (click)="onDelete(player._id)">delete</span>
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
