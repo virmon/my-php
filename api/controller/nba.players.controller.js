@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Team = mongoose.model(process.env.TEAM_MODEL);
 
-const response = { status: 404, message: "" };
+const response = { status: process.env.NOT_FOUND_STATUS_CODE, message: "" };
 
 const _setResponse = function (status, message) {
     response.status = status;
@@ -9,17 +9,18 @@ const _setResponse = function (status, message) {
 }
 
 const _sendResponse = function (res, response) {
-    res.status(response.status).json(response.message);
+    res.status(parseInt(response.status)).json(response.message);
 }
 
 const _checkTeamExists = function (team) {
     return new Promise((resolve, reject) => {
         if (!team) {
-            _setResponse(404, { "message": process.env.TEAM_NOT_FOUND });
+            _setResponse(process.env.NOT_FOUND_STATUS_CODE, { "message": process.env.TEAM_NOT_FOUND });
+            reject();
         } else {
-            _setResponse(200, team.players);
+            _setResponse(process.env.SUCCESS_STATUS_CODE, team.players);
+            resolve(team);
         }
-        resolve(team);
     });
 }
 
@@ -36,7 +37,7 @@ const _findTeam = function (req) {
         count = parseInt(req.query.count);
     }
     if (isNaN(offset) || isNaN(count)) {
-        _setResponse(400, { "message": process.env.LIMITER_ERROR_MESSAGE });
+        _setResponse(process.env.BAD_REQUEST_STATUS_CODE, { "message": process.env.LIMITER_ERROR_MESSAGE });
         return;
     }
 
@@ -54,9 +55,9 @@ const _findPlayer = function (team, playerId) {
 
     return new Promise((resolve, reject) => {
         if (thePlayer) {
-            _setResponse(200, thePlayer);
+            _setResponse(process.env.SUCCESS_STATUS_CODE, thePlayer);
         } else {
-            _setResponse(400, { "message": process.env.PLAYER_NOT_FOUND });
+            _setResponse(process.env.BAD_REQUEST_STATUS_CODE, { "message": process.env.PLAYER_NOT_FOUND });
         }
         resolve();
     })
@@ -84,13 +85,11 @@ const _addPlayer = function (req, res, team) {
 }
 
 const _updateOne = function (req, res, playerUpdateCallback) {
-    const teamId = req.params.teamId;
-
     _findTeam(req)
         .then((team) => _checkTeamExists(team))
         .then((team) => playerUpdateCallback(req, res, team))
-        .then((team) => _setResponse(204, team))
-        .catch((err) => _setResponse(500, err))
+        .then((team) => _setResponse(process.SUCCESS_STATUS_CODE, team))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
@@ -130,7 +129,7 @@ const _deletePlayer = function (theTeam, playerId) {
 const getAll = function (req, res) {
     _findTeam(req)
         .then((team) => _checkTeamExists(team))
-        .catch((err) => _setResponse(500, err))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
@@ -140,7 +139,7 @@ const getOne = function (req, res) {
     _findTeam(req)
         .then((team) => _checkTeamExists(team))
         .then((team) => _findPlayer(team, playerId))
-        .catch((err) => _setResponse(500, err))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
@@ -148,17 +147,15 @@ const addOne = function (req, res) {
     _findTeam(req)
         .then((theTeam) => _checkTeamExists(theTeam))
         .then((theTeam) => _addPlayer(req, res, theTeam))
-        .catch((err) => _setResponse(500, err))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
 const fullUpdateOne = function (req, res) {
-    console.log("Full update player", req.body);
     _updateOne(req, res, _fullPlayerUpdate);
 }
 
 const partialUpdateOne = function (req, res) {
-    console.log("Partial update player", req.body);
     _updateOne(req, res, _partialPlayerUpdate);
 }
 
@@ -167,8 +164,8 @@ const deleteOne = function (req, res) {
 
     _findTeam(req)
         .then((team) => _deletePlayer(team, playerId))
-        .then((deletedPlayer) => _setResponse(202, deletedPlayer))
-        .catch((err) => _setResponse(500, err))
+        .then((deletedPlayer) => _setResponse(process.env.SUCCESS_STATUS_CODE, deletedPlayer))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 

@@ -1,15 +1,15 @@
 const _sendResponse = function (res, response) {
-    res.status(response.status).json(response.message);
+    res.status(parseInt(response.status)).json(response.message);
 }
 
 const authenticate = function (req, res, next) {
-    console.log("authenticate called");
-    const response = { status: 403, message: "No token provided"};
     const headerExists = req.headers.authorization;
 
     if (headerExists) {
         const token = req.headers.authorization.split(" ")[1];
-        if (jwt.verify(token, "secretKey")) {
+        const response = { status: process.env.FORBIDDEN_STATUS_CODE, message: process.env.NO_TOKEN_MESSAGE};
+        
+        if (jwt.verify(token, proess.env.JWT_SECRET_KEY)) {
             next();
         } else {
             _sendResponse(res, response);

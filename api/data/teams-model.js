@@ -6,27 +6,34 @@ const playerSchema = mongoose.Schema({
         required: true
     },
     joinedTeam: {
-        type: Number
+        type: Number,
+        min: process.env.MIN_YEAR,
+        max: process.env.MAX_YEAR
     },
     joinedNBA: {
-        type: Number
+        type: Number,
+        min: process.env.MIN_YEAR,
+        max: process.env.MAX_YEAR
     }
 });
 
 const teamSchema = mongoose.Schema({
     teamName: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     established: {
         type: Number,
+        min: process.env.MIN_YEAR,
+        max: process.env.MAX_YEAR,
         required: true
     },
     championshipsWon: {
         type: Number,
-        "default": 0
+        "default": process.env.DEFAULT_CHAMPIONSHIPS_WON
     },
     players: [playerSchema]
 });
 
-mongoose.model("Team", teamSchema, "teams");
+mongoose.model(process.env.TEAM_MODEL, teamSchema, process.env.TEAM_COLLECTION);

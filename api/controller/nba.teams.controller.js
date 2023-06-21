@@ -1,16 +1,15 @@
 const mongoose = require("mongoose");
-const Team = mongoose.model("Team");
+const Team = mongoose.model(process.env.TEAM_MODEL);
 
-const response = { status: 404, message: {"message": "Not found"}};
+const response = { status: process.env.NOT_FOUND_STATUS_CODE, message: ""};
 
 const _setResponse = function (status, message) {
     response.status = status;
     response.message = message;
-    console.log("Set response to", response);
 }
 
 const _sendResponse = function(res, response) {
-    res.status(response.status).json(response.message);
+    res.status(parseInt(response.status)).json(response.message);
 }
 
 const getAll = function(req, res) {
@@ -24,21 +23,25 @@ const getAll = function(req, res) {
         count = parseInt(req.query.count);
     }
     if (isNaN(offset) || isNaN(count)) {
-        res.status(400).json({"message": "QueryString Offset and Count should be numbers"});
+        _setResponse(process.env.BAD_REQUEST_STATUS_CODE, process.env.LIMITER_ERROR_MESSAGE);
+        _sendResponse(res, response);
         return;
     }
+
+    const mostChampionshipsWon = {"championshipsWon": -1};
     
-    Team.find().skip(offset).limit(count).exec()
-        .then((foundTeams) => _setResponse(200, foundTeams))
-        .catch((err) => _setResponse(500, err))
+    Team.find().skip(offset).limit(count).sort(mostChampionshipsWon).exec()
+        .then((foundTeams) => _setResponse(process.env.SUCCESS_STATUS_CODE, foundTeams))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
 const getOne = function(req, res) {
     const teamId = req.params.teamId;
     Team.findById(teamId).exec()
-        .then((foundTeam) => _setResponse(200, foundTeam))
-        .catch((err) => _setResponse(500, err))
+        .then((foundTeam) => _setResponse(process.env.SUCCESS_STATUS_CODE, foundTeam))
+            .catch(() => _setResponse(process.env.NOT_FOUND_STATUS_CODE, process.env.TEAM_NOT_FOUND))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
@@ -49,10 +52,11 @@ const addOne = function(req, res) {
         const newTeam = {};
         newTeam.teamName = req.body.teamName;
         newTeam.established = req.body.established;
+        newTeam.championshipsWon = req.body.championshipsWon;
 
         Team.create(newTeam)
-            .then((newTeam) => _setResponse(201, newTeam))
-            .catch((err) => _setResponse(500, err))
+            .then((newTeam) => _setResponse(process.env.CREATE_SUCCESS_STATUS_CODE, newTeam))
+            .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
             .finally(() => _sendResponse(res, response));
     }
 }
@@ -76,8 +80,9 @@ const _updateOne = function(req, res, updateTeamCallback) {
     const teamId = req.params.teamId;
     Team.findById(teamId).exec()
         .then((team) => updateTeamCallback(req, team))
-        .then((updatedTeam) => _setResponse(200, updatedTeam))
-        .catch((err) => _setResponse(500, err))
+            .catch(() => _setResponse(process.env.NOT_FOUND_STATUS_CODE, process.env.TEAM_NOT_FOUND))
+        .then((updatedTeam) => _setResponse(process.env.SUCCESS_STATUS_CODE, updatedTeam))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
@@ -130,8 +135,9 @@ const partialUpdateOne = function(req, res) {
 const deleteOne = function(req, res) {
     const teamId = req.params.teamId;
     Team.findById(teamId).remove()
-        .then((deletedTeam) => _setResponse(200, deletedTeam))
-        .catch((err) => _setResponse(500, err))
+        .then((deletedTeam) => _setResponse(process.env.SUCCESS_STATUS_CODE, deletedTeam))
+            .catch(() => _setResponse(process.env.NOT_FOUND_STATUS_CODE, process.env.TEAM_NOT_FOUND))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
 
