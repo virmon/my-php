@@ -12,7 +12,7 @@ const _checkHeader = function (authorizationHeader) {
             const token = authorizationHeader.split(" ")[1];
             resolve(token);
         } else {
-            reject({"message": NO_AUTHORIZATION_HEADER_MESSAGE});
+            reject({"message": process.env.NO_AUTHORIZATION_HEADER_MESSAGE});
         }
     })
 }
