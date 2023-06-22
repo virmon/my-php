@@ -38,7 +38,28 @@ const getAll = function(req, res) {
 
 const getOne = function(req, res) {
     const teamId = req.params.teamId;
-    Team.findById(teamId).exec()
+
+    let offset = parseFloat(process.env.DEFAULT_FIND_OFFSET, process.env.DEFAULT_BASE);
+    let count = parseFloat(process.env.DEFAULT_FIND_COUNT, process.env.DEFAULT_BASE);
+
+    if (req.query && req.query.offset) {
+        offset = parseInt(req.query.offset);
+    }
+    if (req.query && req.query.count) {
+        count = parseInt(req.query.count);
+    }
+    if (isNaN(offset) || isNaN(count)) {
+        _setResponse(process.env.BAD_REQUEST_STATUS_CODE, { "message": process.env.LIMITER_ERROR_MESSAGE });
+        return;
+    }
+
+    const query = {
+        "players": {
+            $slice: [offset, count]
+        }
+    };
+
+    Team.findById(teamId).select(query).exec()
         .then((foundTeam) => _setResponse(process.env.SUCCESS_STATUS_CODE, foundTeam))
             .catch(() => _setResponse(process.env.NOT_FOUND_STATUS_CODE, process.env.TEAM_NOT_FOUND))
         .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))

@@ -13,9 +13,17 @@ export class PlayerDataService {
 
   constructor(private _http: HttpClient) { }
 
-  public getAll(teamId: String): Observable<Player[]> {
-    const url = `${this.baseUrl}/${teamId}/players`;
+  public getAll(teamId: String, shouldReturnTotalCount?: boolean): Observable<Player[]> {
+    let url = `${this.baseUrl}/${teamId}/players`;
+    if (shouldReturnTotalCount) {
+      url = `${url}?count=true`;
+    }
     return this._http.get<Player[]>(url);
+  }
+
+  public getCount(teamId: String): Observable<[]> {
+    const url = `${this.baseUrl}/${teamId}/players`;
+    return this._http.get<[]>(url);
   }
   
   public getOne(teamId: String, playerId: String): Observable<Player> {
