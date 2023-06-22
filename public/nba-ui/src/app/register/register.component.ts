@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UsersDataService } from '../users-data.service';
+import { environment } from 'src/environments/environment.development';
 
 export class User {
   #name!: string;
@@ -70,7 +71,7 @@ export class RegisterComponent {
     this._usersService.register(form.value).subscribe({
       next: (result) => {
         this.errorMessage = "";
-        this.successMessage = "Registered successfully";
+        this.successMessage = environment.REGISTER_SUCCESS_MESSAGE;
       },
       error: (err) => {
         this.errorMessage = err.error.message;

@@ -3,7 +3,10 @@
     <h1 class="title">{{team.teamName}}</h1>
     <h3 class="subtitle">Established: {{team.established}}</h3>
     <h4>Championships Won:
-        <span *ngFor="let trophy of trophies"> 🏆 </span>
+        <span *ngIf="trophies.length">{{trophies.length}}</span>
+        <span *ngIf="100 >= trophies.length">
+            <span *ngFor="let trophy of trophies"> 🏆 </span>
+        </span>
         <span *ngIf="!trophies?.length">0</span>
     </h4>
 

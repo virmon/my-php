@@ -25,4 +25,6 @@ div > button {
     display: flex;
     flex-flow: row nowrap;
     margin: auto;
+    width: 100px;
+    justify-content: center;
 }

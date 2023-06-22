@@ -2,6 +2,7 @@
 <div class="banner" *ngIf="successMessage">{{successMessage}}</div>
 
 <div class="register">
+    <h2>Register</h2>
     <form (ngSubmit)="register(registerForm)" [formGroup]="registerForm">
         <div>
             <input 
