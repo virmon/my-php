@@ -88,7 +88,7 @@ const _checkExists = function (foundUser) {
 
 const _generateToken = function (name) {
     const sign = util.promisify(jwt.sign);
-    return sign({"name": name}, process.env.JWT_SECRET_KEY, {expiresIn: process.env.JWT_TOKEN_EXPIRATION});
+    return sign({"name": name}, process.env.JWT_SECRET_KEY, {expiresIn: parseInt(process.env.JWT_TOKEN_EXPIRATION)});
 }
 
 const login = function (req, res) {

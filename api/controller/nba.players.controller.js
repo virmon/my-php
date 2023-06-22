@@ -88,7 +88,7 @@ const _updateOne = function (req, res, playerUpdateCallback) {
     _findTeam(req)
         .then((team) => _checkTeamExists(team))
         .then((team) => playerUpdateCallback(req, res, team))
-        .then((team) => _setResponse(process.SUCCESS_STATUS_CODE, team))
+        .then((team) => _setResponse(process.env.SUCCESS_STATUS_CODE, team))
         .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
 }
@@ -175,5 +175,5 @@ module.exports = {
     addOne: addOne,
     fullUpdateOne: fullUpdateOne,
     partialUpdateOne: partialUpdateOne,
-    deleteOne: deleteOne
+    deleteOne: deleteOne,
 }

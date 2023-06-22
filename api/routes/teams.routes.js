@@ -8,22 +8,22 @@ const router = express.Router();
 
 router.route("/")
     .get(teamsController.getAll)
-    .post(teamsController.addOne);
+    .post(authenticationController.authenticate, teamsController.addOne);
 
 router.route("/:teamId")
     .get(teamsController.getOne)
-    .put(teamsController.fullUpdateOne)
-    .patch(teamsController.partialUpdateOne)
-    .delete(teamsController.deleteOne);
+    .put(authenticationController.authenticate, teamsController.fullUpdateOne)
+    .patch(authenticationController.authenticate, teamsController.partialUpdateOne)
+    .delete(authenticationController.authenticate, teamsController.deleteOne);
 
 router.route("/:teamId/players")
     .get(playersController.getAll)
-    .post(playersController.addOne);
+    .post(authenticationController.authenticate, playersController.addOne);
 
 router.route("/:teamId/players/:playerId")
     .get(playersController.getOne)
-    .put(playersController.fullUpdateOne)
-    .patch(playersController.partialUpdateOne)
-    .delete(playersController.deleteOne);
+    .put(authenticationController.authenticate, playersController.fullUpdateOne)
+    .patch(authenticationController.authenticate, playersController.partialUpdateOne)
+    .delete(authenticationController.authenticate, playersController.deleteOne);
 
 module.exports = router;
