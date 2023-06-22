@@ -1,6 +1,7 @@
 <div *ngIf="errorMessage" class="banner danger">{{errorMessage}}</div>
 <div class="container">
-    <h3>All Teams</h3>
+    <h3>NBA Teams</h3>
+    <p *ngIf="teams.length === 0">No teams found</p>
     <ul>
         <li class="team" *ngFor="let team of teams" routerLink="/teams/{{team._id}}">
             <span>{{team.teamName}}</span>
