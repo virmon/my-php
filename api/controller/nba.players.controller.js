@@ -126,7 +126,7 @@ const _partialPlayerUpdate = function (req, res, team) {
 
 const _deletePlayer = function (theTeam, playerId) {
     const thePlayer = theTeam.players.id(playerId);
-    thePlayer.remove();
+    thePlayer.deleteOne(playerId);
     return theTeam.save();
 }
 

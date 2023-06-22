@@ -94,31 +94,12 @@ const _createNewTeam = function (newTeam) {
 }
 
 const addOne = function(req, res) {
-    if (Array.isArray(req.body)) {
-        addMany(req, res);
-    } else {
-        _fillTeamData(req)
-            .then((filledNewTeam) => _validateTeamName(filledNewTeam))
-            .then((newTeam) => _createNewTeam(newTeam))
-            .then((createdTeam) => _setResponse(process.env.CREATE_SUCCESS_STATUS_CODE, createdTeam))
-            .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
-            .finally(() => _sendResponse(res, response));
-    }
-}
-
-const addMany = function(req, res) {
-    if (Array.isArray(req.body)) {
-        Team.insertMany(req.body, function(err, theTeams) {
-            if (err) {
-                res.status(500).json(err.message);
-            } else {
-                console.log("Inserted new teams", theTeams);
-                res.status(200).json(theTeams);
-            }
-        });
-    } else {
-        res.status(400).json({"message": "Expects to receive array from request body"});
-    }
+    _fillTeamData(req)
+        .then((filledNewTeam) => _validateTeamName(filledNewTeam))
+        .then((newTeam) => _createNewTeam(newTeam))
+        .then((createdTeam) => _setResponse(process.env.CREATE_SUCCESS_STATUS_CODE, createdTeam))
+        .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
+        .finally(() => _sendResponse(res, response));
 }
 
 const _updateOne = function(req, res, updateTeamCallback) {
@@ -179,8 +160,8 @@ const partialUpdateOne = function(req, res) {
 
 const deleteOne = function(req, res) {
     const teamId = req.params.teamId;
-    Team.findById(teamId).remove()
-        .then((deletedTeam) => _setResponse(process.env.SUCCESS_STATUS_CODE, deletedTeam))
+    Team.findById(teamId).deleteOne()
+        .then((deletedTeam) =>  _setResponse(process.env.SUCCESS_STATUS_CODE, deletedTeam))
             .catch(() => _setResponse(process.env.NOT_FOUND_STATUS_CODE, process.env.TEAM_NOT_FOUND))
         .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
         .finally(() => _sendResponse(res, response));
