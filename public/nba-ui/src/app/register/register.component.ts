@@ -69,7 +69,7 @@ export class RegisterComponent {
 
   register(form: FormGroup) {
     this._usersService.register(form.value).subscribe({
-      next: (result) => {
+      next: () => {
         this.errorMessage = "";
         this.successMessage = environment.REGISTER_SUCCESS_MESSAGE;
       },
@@ -77,9 +77,7 @@ export class RegisterComponent {
         this.errorMessage = err.error.message;
         this.successMessage = "";
       },
-      complete: () => {
-        this._initializeForm();
-      }
+      complete: () => { this._initializeForm(); }
     });
   }
 

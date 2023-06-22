@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Player } from '../teams/teams.component';
 import { PlayerDataService } from '../player-data.service';
+import { environment } from 'src/environments/environment.development';
 
 @Component({
   selector: 'app-player-form',
@@ -19,7 +20,7 @@ export class PlayerFormComponent implements OnInit {
   get errorMessage(): string { return this.#errorMessage; }
   set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
 
-  constructor(private _formBuilder: FormBuilder, private route: ActivatedRoute, private playerService: PlayerDataService, private location: Location) {
+  _initializeForm(): void {
     this.#playerForm = this._formBuilder.group({
       playerName: "",
       joinedTeam: "",
@@ -27,9 +28,13 @@ export class PlayerFormComponent implements OnInit {
     });
   }
 
+  constructor(private _formBuilder: FormBuilder, private _route: ActivatedRoute, private _playerService: PlayerDataService, private location: Location) {
+    this._initializeForm();
+  }
+
   private _populateFormPlayerData(teamId: string, playerId: string): void {
 
-    this.playerService.getOne(teamId, playerId).subscribe({
+    this._playerService.getOne(teamId, playerId).subscribe({
       next: (player) => {
         this.#playerForm = this._formBuilder.group({
           playerName: player.playerName,
@@ -37,47 +42,32 @@ export class PlayerFormComponent implements OnInit {
           joinedNBA: player.joinedNBA
         });
       },
-      error: (err) => {
-        this.errorMessage = err.message;
-      },
-      complete: () => {
-        // this.#successMessage = "";
-      }
+      error: (err) => { this.errorMessage = err.message; }
     })
   }
 
   ngOnInit(): void {
-    const teamId = this.route.snapshot.params["teamId"];
-    const playerId = this.route.snapshot.params["playerId"];
+    const teamId = this._route.snapshot.params[environment.TEAM_ID_KEY];
+    const playerId = this._route.snapshot.params[environment.PLAYER_ID_KEY];
 
     if (teamId && playerId) { this._populateFormPlayerData(teamId, playerId); }
   }
 
-  onSubmit(): void {
-    console.log("Submit clicked");
-    
-    const teamId = this.route.snapshot.params["teamId"];
-    const playerId = this.route.snapshot.params["playerId"];
+  onSubmit(): void {    
+    const teamId = this._route.snapshot.params[environment.TEAM_ID_KEY];
+    const playerId = this._route.snapshot.params[environment.PLAYER_ID_KEY];
 
     const thePlayer: Player = this.playerForm.value;
 
     if (playerId) {
-      this.playerService.updateOne(teamId, playerId, thePlayer).subscribe({
-        error: (err) => {
-          this.errorMessage = err.error.message;
-        },
-        complete: () => {
-          this.goBack();
-        }
+      this._playerService.updateOne(teamId, playerId, thePlayer).subscribe({
+        error: (err) => { this.errorMessage = err.error.message; },
+        complete: () => { this.goBack(); }
       });
     } else {
-      this.playerService.addOne(teamId, thePlayer).subscribe({
-        error: (err) => {
-          this.errorMessage = err.error.message;
-        },
-        complete: () => {
-          this.goBack();
-        }
+      this._playerService.addOne(teamId, thePlayer).subscribe({
+        error: (err) => { this.errorMessage = err.error.message; },
+        complete: () => { this.goBack(); }
       });
     }
   }
@@ -85,5 +75,4 @@ export class PlayerFormComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
-
 }

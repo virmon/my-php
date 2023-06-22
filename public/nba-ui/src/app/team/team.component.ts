@@ -5,6 +5,7 @@ import { TeamDataService } from '../team-data.service';
 import { Player, Team } from '../teams/teams.component';
 import { PlayerDataService } from '../player-data.service';
 import { AuthenticationService } from '../authentication.service';
+import { environment } from 'src/environments/environment.development';
 
 @Component({
   selector: 'app-team',
@@ -47,7 +48,7 @@ export class TeamComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const teamId: String = this._route.snapshot.params["teamId"];
+    const teamId: String = this._route.snapshot.params[environment.TEAM_ID_KEY];
     this._teamsService.getOne(teamId).subscribe({
       next: (team) => { this._fillTeam(team); },
       error: (err) => { this.errorMessage = err.error; },
@@ -70,6 +71,6 @@ export class TeamComponent implements OnInit {
   }
 
   goBack(): void {
-    this._router.navigate(['teams']);
+    this._router.navigate([environment.TEAMS_BASE_PATH]);
   }
 }

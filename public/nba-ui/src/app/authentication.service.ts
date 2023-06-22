@@ -23,12 +23,12 @@ export class AuthenticationService {
     return localStorage.getItem("token");
   }
 
-  login(token: LoginToken) {
+  login(token: LoginToken): void {
     this.isLoggedIn = true;
     localStorage.setItem("token", token.token);
   }
 
-  logout() {
+  logout(): void {
     this.isLoggedIn = false;
     localStorage.clear();
   }

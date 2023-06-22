@@ -16,7 +16,6 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this._authentication.getToken();
-    console.log("interceptor called");
 
     if (!token) {
       return next.handle(request);

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TeamDataService } from '../team-data.service';
+import { environment } from 'src/environments/environment.development';
 
 export class Player {
   #_id!: String;
@@ -57,19 +58,21 @@ export class TeamsComponent implements OnInit {
 
   teams!: Team[];
 
+  #errorMessage!: string;
+  get errorMessage(): string { return this.#errorMessage; }
+  set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
+
   constructor(private _teamsService: TeamDataService) { }
+
+  _fillTeams(teams: Team[]) {
+    this.teams = teams;
+    this.errorMessage = "";
+  }
 
   ngOnInit(): void {
     this._teamsService.getAll().subscribe({
-      next: (teams) => {
-        this.teams = teams;
-      },
-      error: (err) => {
-        console.log("Error fetching teams", err);
-      },
-      complete: () => {
-        console.log("Teams fetch complete");
-      }
+      next: (teams) => { this._fillTeams(teams); },
+      error: (err) => { this.errorMessage = environment.TEAMS_ERROR_MESSAGE; }
     })
   }
 }

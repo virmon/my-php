@@ -16,6 +16,7 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationInterceptor } from './authentication.interceptor';
 import { ProfileComponent } from './profile/profile.component';
+import { environment } from 'src/environments/environment.development';
 
 @NgModule({
   declarations: [
@@ -37,47 +38,47 @@ import { ProfileComponent } from './profile/profile.component';
     FormsModule,
     RouterModule.forRoot([
       {
-        path: "",
+        path: environment.HOME_BASE_PATH,
         component: TeamsComponent
       },
       {
-        path: "teams",
+        path: environment.TEAMS_BASE_PATH,
         component: TeamsComponent
       },
       {
-        path: "teams/:teamId",
+        path: `${environment.TEAMS_BASE_PATH}/:teamId`,
         component: TeamComponent
       },
       {
-        path: "teamForm",
+        path: environment.TEAM_FORM_BASE_PATH,
         component: TeamFormComponent
       },
       {
-        path: "teamForm/:teamId",
+        path: `${environment.TEAM_FORM_BASE_PATH}/:teamId`,
         component: TeamFormComponent
       },
       {
-        path: "playerForm/:teamId",
+        path: `${environment.PLAYER_FORM_BASE_PATH}/:teamId`,
         component: PlayerFormComponent
       },
       {
-        path: "playerForm/:teamId/:playerId",
+        path: `${environment.PLAYER_FORM_BASE_PATH}/:teamId/:playerId`,
         component: PlayerFormComponent
       },
       {
-        path: "register",
+        path: environment.REGISTER_BASE_PATH,
         component: RegisterComponent
       },
       {
-        path: "login",
+        path: environment.LOGIN_BASE_PATH,
         component: LoginComponent
       },
       {
-        path: "profile",
+        path: environment.PROFILE_BASE_PATH,
         component: ProfileComponent
       },
       {
-        path: "**",
+        path: environment.NOT_FOUND_BASE_PATH,
         component: NotFoundComponent
       }
     ])
