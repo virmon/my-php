@@ -66,17 +66,41 @@ const getOne = function(req, res) {
         .finally(() => _sendResponse(res, response));
 }
 
+const _fillTeamData = function (req) {
+    const newTeam = {};
+    newTeam.teamName = req.body.teamName;
+    newTeam.established = req.body.established;
+    newTeam.championshipsWon = req.body.championshipsWon;
+    return new Promise((resolve, reject) => {
+        resolve(newTeam);
+    });
+}
+
+const _validateTeamName = function (filledNewTeam) {
+    return new Promise((resolve, reject) => {
+        Team.findOne({"teamName": filledNewTeam.teamName})
+            .then((foundTeam) => {
+                if (!foundTeam) {
+                    resolve(filledNewTeam);
+                } else {
+                    reject({"message": process.env.TEAM_NAME_UNAVAILABLE_MESSAGE});
+                }
+            });
+    });
+}
+
+const _createNewTeam = function (newTeam) {
+    return Team.create(newTeam);
+}
+
 const addOne = function(req, res) {
     if (Array.isArray(req.body)) {
         addMany(req, res);
     } else {
-        const newTeam = {};
-        newTeam.teamName = req.body.teamName;
-        newTeam.established = req.body.established;
-        newTeam.championshipsWon = req.body.championshipsWon;
-
-        Team.create(newTeam)
-            .then((newTeam) => _setResponse(process.env.CREATE_SUCCESS_STATUS_CODE, newTeam))
+        _fillTeamData(req)
+            .then((filledNewTeam) => _validateTeamName(filledNewTeam))
+            .then((newTeam) => _createNewTeam(newTeam))
+            .then((createdTeam) => _setResponse(process.env.CREATE_SUCCESS_STATUS_CODE, createdTeam))
             .catch((err) => _setResponse(process.env.SYSTEM_ERROR_STATUS_CODE, err))
             .finally(() => _sendResponse(res, response));
     }

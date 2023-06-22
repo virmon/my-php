@@ -12,3 +12,14 @@ div.container {
     padding: 0;
     margin: 20px;
 }
+
+.banner {
+    height: 100%;
+    color: white;
+    padding: 10px;
+    background-color: rgb(16, 134, 65);
+}
+
+.danger {
+    background-color: rgb(134, 16, 16);
+}

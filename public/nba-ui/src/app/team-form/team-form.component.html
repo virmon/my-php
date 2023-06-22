@@ -1,5 +1,8 @@
 <div class="container">
     <h3>Team Form</h3>
+    <div *ngIf="errorMessage" class="banner danger">
+        {{errorMessage}}
+    </div>
     <form (ngSubmit)="onSubmit()" [formGroup]="teamForm">
         <div>
             <label for="teamName">Team</label>
@@ -22,7 +25,6 @@
             <button type="submit">Save</button>
         </div>
     </form>
-
     <div>
         <button (click)="goBack()">Go back</button>
     </div>

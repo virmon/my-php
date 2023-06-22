@@ -15,10 +15,6 @@ export class PlayerFormComponent implements OnInit {
   #playerForm!: FormGroup;
   get playerForm(): FormGroup { return this.#playerForm; }
 
-  #successMessage!: string;
-  get successMessage(): string { return this.#successMessage; }
-  set successMessage(successMessage: string) { this.#successMessage = successMessage; }
-  
   #errorMessage!: string;
   get errorMessage(): string { return this.#errorMessage; }
   set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
@@ -67,11 +63,8 @@ export class PlayerFormComponent implements OnInit {
 
     if (playerId) {
       this.playerService.updateOne(teamId, playerId, thePlayer).subscribe({
-        next: (player) => {
-          this.successMessage = "Player updated successfully"
-        },
         error: (err) => {
-          this.errorMessage = "Invalid input";
+          this.errorMessage = err.error.message;
         },
         complete: () => {
           this.goBack();
@@ -79,17 +72,13 @@ export class PlayerFormComponent implements OnInit {
       });
     } else {
       this.playerService.addOne(teamId, thePlayer).subscribe({
-        next: (player) => {
-          this.successMessage = "Player added successfully"
-        },
         error: (err) => {
-          this.errorMessage = "Invalid input.";
+          this.errorMessage = err.error.message;
         },
         complete: () => {
           this.goBack();
         }
       });
-      
     }
   }
 

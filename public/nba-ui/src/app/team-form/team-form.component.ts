@@ -16,6 +16,10 @@ export class TeamFormComponent implements OnInit {
   #teamForm!: FormGroup;
   get teamForm(): FormGroup { return this.#teamForm; }
 
+  #errorMessage!: string;
+  get errorMessage(): string { return this.#errorMessage; }
+  set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
+
   constructor(private _formBuilder: FormBuilder, private _teamService: TeamDataService, private _route: ActivatedRoute, private _router: Router, private _location: Location) {
     this.#teamForm = this._formBuilder.group({
       teamName: "",
@@ -49,7 +53,7 @@ export class TeamFormComponent implements OnInit {
           console.log("Team updated", team);
         },
         error: (err) => {
-
+          this.errorMessage = err.error.message;
         },
         complete: () => {
           this.goBack();
@@ -61,7 +65,7 @@ export class TeamFormComponent implements OnInit {
           console.log("New team added", team);
         },
         error: (err) => {
-
+          this.errorMessage = err.error.message;
         },
         complete: () => {
           this._router.navigate(['teams']);

@@ -1,3 +1,5 @@
+<div class="banner" *ngIf="errorMessage">{{errorMessage}}</div>
+
 <div class="login">
     <form *ngIf="!isLoggedIn" #loginForm="ngForm" (ngSubmit)="login()">
         <div>

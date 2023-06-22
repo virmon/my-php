@@ -3,24 +3,24 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { UsersDataService } from '../users-data.service';
 
 export class User {
-  #name!: String;
-  #username!: String;
-  #password!: String;
-  #repeatPassword!: String;
+  #name!: string;
+  #username!: string;
+  #password!: string;
+  #repeatPassword!: string;
 
-  get name(): String { return this.#name; }
-  set name(name: String) { this.#name = name; }
+  get name(): string { return this.#name; }
+  set name(name: string) { this.#name = name; }
 
-  get username(): String { return this.#username; }
-  set username(username: String) { this.#username = username; }
+  get username(): string { return this.#username; }
+  set username(username: string) { this.#username = username; }
 
-  get password(): String { return this.#password; }
-  set password(password: String) { this.#password = password; }
+  get password(): string { return this.#password; }
+  set password(password: string) { this.#password = password; }
 
-  get repeatPassword(): String { return this.#repeatPassword; }
-  set repeatPassword(repeatPassword: String) { this.#repeatPassword = repeatPassword; }
+  get repeatPassword(): string { return this.#repeatPassword; }
+  set repeatPassword(repeatPassword: string) { this.#repeatPassword = repeatPassword; }
 
-  constructor(username: String, password: String) { 
+  constructor(username: string, password: string) { 
     this.username = username;
     this.password = password;
   }
@@ -45,7 +45,19 @@ export class RegisterComponent {
   #registerForm!: FormGroup;
   get registerForm(): FormGroup { return this.#registerForm; }
 
+  #errorMessage!: string;
+  get errorMessage(): string { return this.#errorMessage; }
+  set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
+    
+  #successMessage!: string
+  get successMessage(): string { return this.#successMessage; }
+  set successMessage(successMessage: string) { this.#successMessage = successMessage; }
+
   constructor(private _formBuilder: FormBuilder, private _usersService: UsersDataService) {
+    this._initializeForm();
+  }
+
+  _initializeForm() {
     this.#registerForm = this._formBuilder.group({
       name: "",
       username: "",
@@ -55,18 +67,17 @@ export class RegisterComponent {
   }
 
   register(form: FormGroup) {
-    // const newUser = new User(form.value.username, form.value.password);
-
     this._usersService.register(form.value).subscribe({
       next: (result) => {
-        console.log(result);
-        
+        this.errorMessage = "";
+        this.successMessage = "Registered successfully";
       },
       error: (err) => {
-        console.log(err);
+        this.errorMessage = err.error.message;
+        this.successMessage = "";
       },
       complete: () => {
-
+        this._initializeForm();
       }
     });
   }

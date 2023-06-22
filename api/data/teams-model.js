@@ -8,12 +8,14 @@ const playerSchema = mongoose.Schema({
     joinedTeam: {
         type: Number,
         min: process.env.MIN_YEAR,
-        max: process.env.MAX_YEAR
+        max: process.env.MAX_YEAR,
+        required: true
     },
     joinedNBA: {
         type: Number,
         min: process.env.MIN_YEAR,
-        max: process.env.MAX_YEAR
+        max: process.env.MAX_YEAR,
+        required: true
     }
 });
 

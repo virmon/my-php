@@ -1,3 +1,6 @@
+<div class="banner danger" *ngIf="errorMessage">{{errorMessage}}</div>
+<div class="banner" *ngIf="successMessage">{{successMessage}}</div>
+
 <div class="register">
     <form (ngSubmit)="register(registerForm)" [formGroup]="registerForm">
         <div>

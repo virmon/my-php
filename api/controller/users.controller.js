@@ -52,8 +52,31 @@ const _createNewUser = function (validatedUser) {
     return User.create(validatedUser);
 }
 
+const _validatePassword = function (req) {
+    const requestedPassword = req.body.password;
+    const requestedRepeatPassword = req.body.repeatPassword;
+
+    return new Promise((resolve, reject) => {
+        if (requestedPassword && requestedRepeatPassword) {
+            if (requestedPassword.length === 0) {
+                reject({"message": process.env.PASSWORD_INVALID_MESSAGE});
+                return;
+            }
+            if (requestedPassword !== requestedRepeatPassword) {
+                reject({"message": process.env.PASSWORD_NOT_MATCH_MESSAGE});
+                return;
+            }
+            resolve(requestedPassword);
+        } else {
+            reject({"message": process.env.PASSWORD_NOT_MATCH_MESSAGE});
+        }
+      
+    });
+}
+
 const register = function (req, res) {
-    _generateSalt()
+    _validatePassword(req)
+        .then(() => _generateSalt())
         .then((salt) => _hashPassword(req.body.password, salt))
         .then((hashedPassword) => _fillUserData(req, hashedPassword))
         .then((filledUser) => _validateUsername(filledUser))

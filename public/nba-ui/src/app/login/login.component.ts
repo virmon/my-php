@@ -18,13 +18,17 @@ export class LoginToken {
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  username!: String;
-  password!: String;
+  username!: string;
+  password!: string;
+  #errorMessage!: string
 
   get name(): string { return this._authentication.name; }
 
   get isLoggedIn() { return this._authentication.isLoggedIn; }
   set isLoggedIn(isLoggedIn: boolean) { this._authentication.isLoggedIn = isLoggedIn; }
+
+  get errorMessage(): string { return this.#errorMessage; }
+  set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
 
   constructor(private _usersService: UsersDataService, private _authentication: AuthenticationService, private _router: Router) { }
 
@@ -40,7 +44,7 @@ export class LoginComponent implements OnInit {
         this._authentication.login(loginToken);
       },
       error: (err) => {
-        console.log("Error logging in", err.message);
+        this.errorMessage =err.error.message;
       },
       complete: () => {
         this._router.navigate(['profile']);

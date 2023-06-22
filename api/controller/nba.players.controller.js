@@ -79,9 +79,13 @@ const _saveNewPlayer = function (team, newPlayer) {
 }
 
 const _addPlayer = function (req, res, team) {
-    _fillPlayerData(req)
-        .then((filledNewPlayer) => _saveNewPlayer(team, filledNewPlayer))
-        .then((updatedTeam) => _setResponse(201, updatedTeam));
+    return new Promise((resolve, reject) => {
+        _fillPlayerData(req)
+            .then((filledNewPlayer) => _saveNewPlayer(team, filledNewPlayer))
+            .then((updatedTeam) => _setResponse(201, updatedTeam))
+            .then(() => resolve())
+            .catch((err) => reject(err));
+    })
 }
 
 const _updateOne = function (req, res, playerUpdateCallback) {
