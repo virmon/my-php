@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { TeamDataService } from '../team-data.service';
 import { Player, Team } from '../teams/teams.component';
-import { ActivatedRoute } from '@angular/router';
 import { PlayerDataService } from '../player-data.service';
 import { AuthenticationService } from '../authentication.service';
 
@@ -16,6 +17,8 @@ export class TeamComponent implements OnInit {
   #players!: Player[];
   #trophies: Number[] = [];
 
+  errorMessage!: string;
+
   get team(): Team { return this.#team; }
   set team(team: Team) { this.#team = team; }
 
@@ -28,7 +31,7 @@ export class TeamComponent implements OnInit {
   get isLoggedIn(): boolean { return this._authentication.isLoggedIn; }
   set isLoggedIn(isLoggedIn: boolean) { this._authentication.isLoggedIn = isLoggedIn; }
 
-  constructor(private _teamsService: TeamDataService, private _playerService: PlayerDataService, private _route: ActivatedRoute, private _authentication: AuthenticationService) {
+  constructor(private _teamsService: TeamDataService, private _playerService: PlayerDataService, private _route: ActivatedRoute, private _authentication: AuthenticationService, private _router: Router) {
     this.team = new Team();
     this.players = [];
   }
@@ -43,7 +46,8 @@ export class TeamComponent implements OnInit {
         this.trophies = new Array<Number>(this.team.championshipsWon);        
       },
       error: (err) => {
-        console.log("Error fetching one team", err);
+        console.log(err.error);
+        this.errorMessage = err.error;
       },
       complete: () => {
 
@@ -51,7 +55,7 @@ export class TeamComponent implements OnInit {
     })
   }
 
-  onDelete(playerId: String): void {
+  onDeletePlayer(playerId: String): void {
     this._playerService.deleteOne(this.team._id, playerId).subscribe({
       next: (team) => {
         console.log("Deleted player", team.players);
@@ -64,5 +68,23 @@ export class TeamComponent implements OnInit {
         
       }
     });
+  }
+
+  onDeleteTeam(): void {
+    this._teamsService.deleteOne(this.team._id).subscribe({
+      next: (team) => {
+        this.players = team.players;
+      },
+      error: (err) => {
+        console.log("Error deleting player", err);
+      },
+      complete: () => {
+        this.goBack();
+      }
+    });
+  }
+
+  goBack(): void {
+    this._router.navigate(['teams']);
   }
 }

@@ -1,39 +1,29 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="teamForm">
-    <div>
-        <label for="teamName">Team</label>
-        <input 
-            placeholder="the team name" 
-            id="teamName"
-            name="teamName"
-            formControlName="teamName"
-        />
-    </div>
+<div class="container">
+    <h3>Team Form</h3>
+    <form (ngSubmit)="onSubmit()" [formGroup]="teamForm">
+        <div>
+            <label for="teamName">Team</label>
+            <input placeholder="the team name" id="teamName" name="teamName" formControlName="teamName" />
+        </div>
+
+        <div>
+            <label for="established">Established</label>
+            <input placeholder="year the team started" id="established" name="established"
+                formControlName="established" />
+        </div>
+
+        <div>
+            <label for="championshipsWon">Championships Won</label>
+            <input placeholder="number of championships won" id="championshipsWon" name="championshipsWon"
+                formControlName="championshipsWon" />
+        </div>
+
+        <div>
+            <button type="submit">Save</button>
+        </div>
+    </form>
 
     <div>
-        <label for="established">Established</label>
-        <input 
-            placeholder="year the team started" 
-            id="established" 
-            name="established"
-            formControlName="established"
-        />
+        <button (click)="goBack()">Go back</button>
     </div>
-
-    <div>
-        <label for="championshipsWon">Championships Won</label>
-        <input 
-            placeholder="number of championships won" 
-            id="championshipsWon" 
-            name="championshipsWon"
-            formControlName="championshipsWon"
-        />
-    </div>
-    
-    <div>
-        <button type="submit">Save</button>
-    </div>
-</form>
-
-<div>
-    <button (click)="goBack()">Go back</button>
 </div>

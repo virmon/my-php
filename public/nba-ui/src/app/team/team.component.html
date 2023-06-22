@@ -1,13 +1,10 @@
-<div>
-    <div *ngIf="isLoggedIn">
-        <span class="edit-team"><button routerLink="/teamForm/{{team._id}}">Edit Team</button></span>
-    </div>
-
+<app-not-found *ngIf="errorMessage"></app-not-found>
+<div *ngIf="!errorMessage" class="container">
     <h1 class="title">{{team.teamName}}</h1>
     <h3 class="subtitle">Established: {{team.established}}</h3>
     <h4>Championships Won:
         <span *ngFor="let trophy of trophies"> 🏆 </span>
-        <span *ngIf="!trophies.length">0</span>
+        <span *ngIf="!trophies?.length">0</span>
     </h4>
 
     <div *ngIf="isLoggedIn">
@@ -16,8 +13,8 @@
         </button>
     </div>
 
-    <div *ngIf="!players.length">No players found</div>
-    <div *ngIf="players.length">
+    <div *ngIf="!players?.length">No players found</div>
+    <div *ngIf="players?.length">
         <table class="players">
             <tr>
                 <th>Players</th>
@@ -32,10 +29,14 @@
                 <td *ngIf="isLoggedIn">
                     <span class="actions-container">
                         <span class="material-icons edit-action" routerLink="/playerForm/{{team._id}}/{{player._id}}">edit</span>
-                        <span class="material-icons delete-action" (click)="onDelete(player._id)">delete</span>
+                        <span class="material-icons delete-action" (click)="onDeletePlayer(player._id)">delete</span>
                     </span>
                 </td>
             </tr>
         </table>
+    </div>
+    <div class="team-action" *ngIf="isLoggedIn">
+        <span class="edit-team"><button routerLink="/teamForm/{{team._id}}">Edit Team</button></span>
+        <span class="edit-team"><button (click)="onDeleteTeam()">Delete Team</button></span>
     </div>
 </div>

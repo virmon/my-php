@@ -15,6 +15,13 @@ export class PlayerFormComponent implements OnInit {
   #playerForm!: FormGroup;
   get playerForm(): FormGroup { return this.#playerForm; }
 
+  #successMessage!: string;
+  get successMessage(): string { return this.#successMessage; }
+  set successMessage(successMessage: string) { this.#successMessage = successMessage; }
+  
+  #errorMessage!: string;
+  get errorMessage(): string { return this.#errorMessage; }
+  set errorMessage(errorMessage: string) { this.#errorMessage = errorMessage; }
 
   constructor(private _formBuilder: FormBuilder, private route: ActivatedRoute, private playerService: PlayerDataService, private location: Location) {
     this.#playerForm = this._formBuilder.group({
@@ -26,20 +33,27 @@ export class PlayerFormComponent implements OnInit {
 
   private _populateFormPlayerData(teamId: string, playerId: string): void {
 
-    this.playerService.getOne(teamId, playerId).subscribe(player => {   
-      console.log("_populateFormPlayerData", player);
-      this.#playerForm = this._formBuilder.group({
-        playerName: player.playerName,
-        joinedTeam: player.joinedTeam,
-        joinedNBA: player.joinedNBA
-      });
+    this.playerService.getOne(teamId, playerId).subscribe({
+      next: (player) => {
+        this.#playerForm = this._formBuilder.group({
+          playerName: player.playerName,
+          joinedTeam: player.joinedTeam,
+          joinedNBA: player.joinedNBA
+        });
+      },
+      error: (err) => {
+        this.errorMessage = err.message;
+      },
+      complete: () => {
+        // this.#successMessage = "";
+      }
     })
   }
 
   ngOnInit(): void {
     const teamId = this.route.snapshot.params["teamId"];
     const playerId = this.route.snapshot.params["playerId"];
-    
+
     if (teamId && playerId) { this._populateFormPlayerData(teamId, playerId); }
   }
 
@@ -54,10 +68,10 @@ export class PlayerFormComponent implements OnInit {
     if (playerId) {
       this.playerService.updateOne(teamId, playerId, thePlayer).subscribe({
         next: (player) => {
-          console.log("Player updated", player);
+          this.successMessage = "Player updated successfully"
         },
         error: (err) => {
-          console.log("Error updating player", err);
+          this.errorMessage = "Invalid input";
         },
         complete: () => {
           this.goBack();
@@ -66,10 +80,10 @@ export class PlayerFormComponent implements OnInit {
     } else {
       this.playerService.addOne(teamId, thePlayer).subscribe({
         next: (player) => {
-          console.log("New player added", player);
+          this.successMessage = "Player added successfully"
         },
         error: (err) => {
-          console.log("Error adding player", err);
+          this.errorMessage = "Invalid input.";
         },
         complete: () => {
           this.goBack();
@@ -80,7 +94,6 @@ export class PlayerFormComponent implements OnInit {
   }
 
   goBack(): void {
-    console.log("Back clicked");
     this.location.back();
   }
 

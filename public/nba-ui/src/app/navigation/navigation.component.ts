@@ -11,7 +11,7 @@ export class NavigationComponent implements OnInit {
   get isLoggedIn(): boolean { return this._authentication.isLoggedIn; }
   set isLoggedIn(isLoggedIn: boolean) { this._authentication.isLoggedIn = isLoggedIn; }
 
-  constructor(private _route: Router, private _authentication: AuthenticationService) {
+  constructor(private _router: Router, private _authentication: AuthenticationService) {
     console.log("Navigation constructor called");
   }
 
@@ -22,6 +22,6 @@ export class NavigationComponent implements OnInit {
 
   logout() {
     this._authentication.logout();
-    this._route.navigate(['login']);
+    this._router.navigate(['login']);
   }
 }

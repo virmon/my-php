@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { TeamDataService } from '../team-data.service';
@@ -16,7 +16,7 @@ export class TeamFormComponent implements OnInit {
   #teamForm!: FormGroup;
   get teamForm(): FormGroup { return this.#teamForm; }
 
-  constructor(private _formBuilder: FormBuilder, private teamService: TeamDataService, private route: ActivatedRoute, private location: Location) {
+  constructor(private _formBuilder: FormBuilder, private _teamService: TeamDataService, private _route: ActivatedRoute, private _router: Router, private _location: Location) {
     this.#teamForm = this._formBuilder.group({
       teamName: "",
       established: "",
@@ -25,12 +25,12 @@ export class TeamFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const teamId = this.route.snapshot.params["teamId"];
+    const teamId = this._route.snapshot.params["teamId"];
     if (teamId) { this._populateFormTeamData(teamId); }
   }
 
   private _populateFormTeamData(teamId: string): void {
-    this.teamService.getOne(teamId).subscribe(team => {      
+    this._teamService.getOne(teamId).subscribe((team) => {      
       this.#teamForm = this._formBuilder.group({
         teamName: team.teamName,
         established: team.established,
@@ -40,22 +40,37 @@ export class TeamFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const teamId = this.route.snapshot.params["teamId"];
+    const teamId = this._route.snapshot.params["teamId"];
     const theTeam: Team = this.#teamForm.value;
 
     if (teamId) {
-      this.teamService.updateOne(teamId, theTeam).subscribe(team => {
-        console.log("Team updated", team);
-      })
+      this._teamService.updateOne(teamId, theTeam).subscribe({
+        next: (team) => {
+          console.log("Team updated", team);
+        },
+        error: (err) => {
+
+        },
+        complete: () => {
+          this.goBack();
+        }
+      });
     } else {
-      this.teamService.addOne(theTeam).subscribe(team => {
-        console.log("New team added", team);
+      this._teamService.addOne(theTeam).subscribe({
+        next: (team) => {
+          console.log("New team added", team);
+        },
+        error: (err) => {
+
+        },
+        complete: () => {
+          this._router.navigate(['teams']);
+        }
       });
     }
-    this.goBack();
   }
 
   goBack(): void {
-    this.location.back();
+    this._location.back();
   }
 }

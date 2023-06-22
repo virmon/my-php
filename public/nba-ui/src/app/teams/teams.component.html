@@ -1,6 +1,9 @@
-<div>
+<div class="container">
     <h3>All Teams</h3>
     <ul>
-        <li *ngFor="let team of teams" routerLink="/teams/{{team._id}}">{{team.teamName}}</li>
+        <li class="team" *ngFor="let team of teams" routerLink="/teams/{{team._id}}">
+            <span>{{team.teamName}}</span>
+            <span class="championship-count" *ngIf="team.championshipsWon">{{team.championshipsWon}} 🏆</span>
+        </li>
     </ul>
 </div>
