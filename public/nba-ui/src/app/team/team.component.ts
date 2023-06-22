@@ -36,51 +36,36 @@ export class TeamComponent implements OnInit {
     this.players = [];
   }
 
+  _fillTeam(team: Team) {
+    this.team = team;
+    this.players = team.players;
+    this.trophies = new Array<Number>(this.team.championshipsWon);       
+  }
+
+  _repopulatePlayers(team: Team) {
+    this.players = team.players;
+  }
+
   ngOnInit(): void {
     const teamId: String = this._route.snapshot.params["teamId"];
-
     this._teamsService.getOne(teamId).subscribe({
-      next: (theTeam) => {
-        this.team = theTeam;
-        this.players = theTeam.players;
-        this.trophies = new Array<Number>(this.team.championshipsWon);        
-      },
-      error: (err) => {
-        console.log(err.error);
-        this.errorMessage = err.error;
-      },
-      complete: () => {
-
-      }
+      next: (team) => { this._fillTeam(team); },
+      error: (err) => { this.errorMessage = err.error; },
     })
   }
 
   onDeletePlayer(playerId: String): void {
     this._playerService.deleteOne(this.team._id, playerId).subscribe({
-      next: (team) => {
-        console.log("Deleted player", team.players);
-        this.players = team.players;
-      },
-      error: (err) => {
-        console.log("Error deleting player", err);
-      },
-      complete: () => {
-        
-      }
+      next: (team) => { this._repopulatePlayers(team); },
+      error: (err) => { this.errorMessage = err.error; }
     });
   }
 
   onDeleteTeam(): void {
     this._teamsService.deleteOne(this.team._id).subscribe({
-      next: (team) => {
-        this.players = team.players;
-      },
-      error: (err) => {
-        console.log("Error deleting player", err);
-      },
-      complete: () => {
-        this.goBack();
-      }
+      next: (team) => { this._repopulatePlayers(team); },
+      error: (err) => { this.errorMessage = err.error; },
+      complete: () => { this.goBack();}
     });
   }
 
